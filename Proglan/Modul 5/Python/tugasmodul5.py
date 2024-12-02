@@ -1,12 +1,13 @@
 from docx import Document
+from docx.shared import Inches
 import os
 
 
-def load_from_docx():
+def load_from_docx():  # baca data docx
     pesanan_list = []
-    if os.path.exists("pesanan_restoran.docx"):
-        doc = Document("pesanan_restoran.docx")
-        pesanan = {}
+    if os.path.exists("pesanan_restoran.docx"):  # check kalau ada
+        doc = Document("pesanan_restoran.docx")  # kalau ada buka
+        pesanan = {}  # dictionary
         for para in doc.paragraphs:
             text = para.text.strip()
             if text.startswith("ID Pesanan:"):
@@ -29,8 +30,8 @@ def load_from_docx():
 
 
 def save_to_docx(pesanan_list):
-    doc = Document()
-    doc.add_heading('Manajemen Pesanan Restoran', 0)
+    doc = Document()  # buat dokumen baru
+    doc.add_heading('Manajemen Pesanan Restoran', 0)  # tambah heading
 
     for pesanan in pesanan_list:
         doc.add_paragraph(f"ID Pesanan: {pesanan['id']}")
@@ -39,8 +40,16 @@ def save_to_docx(pesanan_list):
         doc.add_paragraph(f"Jumlah: {pesanan['jumlah']}")
         doc.add_paragraph(f"Status: {pesanan['status']}")
         doc.add_paragraph(f"Image Path: {pesanan['image']}")
+
+        # tambah gambar kalau ada sesuai path
+        if os.path.exists(pesanan['image']):
+            doc.add_paragraph("Gambar Pesanan:")
+            # Atur ukuran gambar sesuai kebutuhan
+            doc.add_picture(pesanan['image'], width=Inches(2))
+
         doc.add_paragraph("-" * 40)
 
+    # simpen ke folder yang sama dengan code ini pake nama ini
     doc.save("pesanan_restoran.docx")
 
 
@@ -50,6 +59,10 @@ def create_pesanan(pesanan_list):
     menu = input("Menu Pesanan: ")
     jumlah = int(input("Jumlah: "))
     image_path = input("Path Image: ")
+
+    if not os.path.exists(image_path):
+        print("File gambar tidak ditemukan. Pastikan path gambar benar.")
+        return
 
     pesanan = {
         "id": id_pesanan,
