@@ -2,6 +2,32 @@ from docx import Document
 import os
 
 
+def load_from_docx():
+    pesanan_list = []
+    if os.path.exists("pesanan_restoran.docx"):
+        doc = Document("pesanan_restoran.docx")
+        pesanan = {}
+        for para in doc.paragraphs:
+            text = para.text.strip()
+            if text.startswith("ID Pesanan:"):
+                if pesanan:
+                    pesanan_list.append(pesanan)
+                pesanan = {"id": int(text.split(":")[1].strip())}
+            elif text.startswith("Nama Pelanggan:"):
+                pesanan["nama"] = text.split(":")[1].strip()
+            elif text.startswith("Menu Pesanan:"):
+                pesanan["menu"] = text.split(":")[1].strip()
+            elif text.startswith("Jumlah:"):
+                pesanan["jumlah"] = int(text.split(":")[1].strip())
+            elif text.startswith("Status:"):
+                pesanan["status"] = text.split(":")[1].strip()
+            elif text.startswith("Image Path:"):
+                pesanan["image"] = text.split(":")[1].strip()
+        if pesanan:
+            pesanan_list.append(pesanan)
+    return pesanan_list
+
+
 def save_to_docx(pesanan_list):
     doc = Document()
     doc.add_heading('Manajemen Pesanan Restoran', 0)
@@ -101,12 +127,7 @@ def search_pesanan(pesanan_list):
 
 
 def main():
-    pesanan_list = []
-
-    if os.path.exists("pesanan_restoran.docx"):
-        doc = Document("pesanan_restoran.docx")
-        for para in doc.paragraphs:
-            print(para.text)
+    pesanan_list = load_from_docx()
 
     while True:
         print("\n1. Buat Pesanan")
